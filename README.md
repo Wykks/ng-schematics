@@ -22,13 +22,13 @@ Keep in mind that, dependencies listed in generated package.json may not be up t
 ## What's in it?
 
 Run ng-new of Angular CLI, then apply the following changes :
-Add Jest (in place of karma) with @ngneat/spectator and ng-mocks
-Remove protractor
-Add prettier and tslint-config-prettier
-Add lint-staged with husky to launch lint and prettier on commit
-Add commitizen (without hooks, just through commit script)
-Add typescript-tslint-plugin with vscode config
-Enforce onPush change detection strategy
+- Add Jest (in place of karma) with @ngneat/spectator and ng-mocks
+- Remove protractor
+- Add prettier and tslint-config-prettier
+- Add lint-staged with husky to launch lint and prettier on commit
+- Add commitizen (without hooks, just through commit script)
+- Add typescript-tslint-plugin with vscode config
+- Enforce onPush change detection strategy
 
 ## Development
 
