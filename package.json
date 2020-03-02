@@ -1,6 +1,6 @@
 {
   "name": "@wykks/schematics",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Opinionated angular schematics",
   "scripts": {
     "build": "tsc -p tsconfig.json"
@@ -13,21 +13,17 @@
   "license": "MIT",
   "schematics": "./src/collection.json",
   "dependencies": {
-    "@angular-devkit/core": "9.0.1",
-    "@angular-devkit/schematics": "9.0.1",
-    "@schematics/angular": "9.0.1",
-    "typescript": "3.7.5"
+    "@angular-devkit/core": "9.0.4",
+    "@angular-devkit/schematics": "9.0.4",
+    "@schematics/angular": "9.0.4",
+    "typescript": "3.8.3"
   },
   "devDependencies": {
-    "@angular/cli": "9.0.1",
-    "@ngneat/spectator": "4.11.1",
-    "@types/jasmine": "3.5.3",
-    "@types/node": "13.7.1",
-    "husky": "4.2.2",
-    "jasmine": "3.5.0",
-    "lint-staged": "10.0.7",
-    "prettier": "1.19.1",
-    "typescript-tslint-plugin": "0.5.5"
+    "@angular/cli": "9.0.4",
+    "@types/node": "13.7.7",
+    "husky": "4.2.3",
+    "lint-staged": "10.0.8",
+    "prettier": "1.19.1"
   },
   "lint-staged": {
     "*.{js,json,md,ts}": "prettier --write"

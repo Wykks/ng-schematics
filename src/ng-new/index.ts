@@ -1,26 +1,22 @@
-import {
-  Rule,
-  chain,
-  externalSchematic,
-  Tree,
-  applyToSubtree,
-  SchematicContext,
-  mergeWith,
-  apply,
-  url,
-  template
-} from '@angular-devkit/schematics';
-import { NodePackageInstallTask, RepositoryInitializerTask } from '@angular-devkit/schematics/tasks';
 import { strings, workspaces } from '@angular-devkit/core';
 import {
-  NodeDependencyType,
-  addPackageJsonDependency,
-  removePackageJsonDependency
-} from '@schematics/angular/utility/dependencies';
+  apply,
+  applyToSubtree,
+  chain,
+  externalSchematic,
+  mergeWith,
+  Rule,
+  SchematicContext,
+  template,
+  Tree,
+  url
+} from '@angular-devkit/schematics';
+import { NodePackageInstallTask, RepositoryInitializerTask } from '@angular-devkit/schematics/tasks';
+import { addPackageJsonDependency, removePackageJsonDependency } from '@schematics/angular/utility/dependencies';
 import { updateWorkspace } from '@schematics/angular/utility/workspace';
-import { jestChain } from './jest';
-
 import { addOnPushToComponent } from './addOnPush';
+import { baseDependencies } from './dependencies';
+import { jestChain } from './jest';
 
 function removeProtractor(host: Tree) {
   host.getDir('e2e').visit(file => {
@@ -80,43 +76,7 @@ function addConfigToPackageJSON(host: Tree) {
 }
 
 function addDependenciesToPackageJson(host: Tree) {
-  [
-    {
-      type: NodeDependencyType.Dev,
-      name: 'husky',
-      version: '^4.2.0'
-    },
-    {
-      type: NodeDependencyType.Dev,
-      name: 'lint-staged',
-      version: '^10.0.0'
-    },
-    {
-      type: NodeDependencyType.Dev,
-      name: 'prettier',
-      version: '^1.19.0'
-    },
-    {
-      type: NodeDependencyType.Dev,
-      name: 'tslint-config-prettier',
-      version: '^1.18.0'
-    },
-    {
-      type: NodeDependencyType.Dev,
-      name: 'typescript-tslint-plugin',
-      version: '^0.5.5'
-    },
-    {
-      type: NodeDependencyType.Dev,
-      name: 'commitizen',
-      version: '^4.0.0'
-    },
-    {
-      type: NodeDependencyType.Dev,
-      name: 'cz-conventional-changelog',
-      version: '^3.1.0'
-    }
-  ].forEach(dependency => addPackageJsonDependency(host, dependency));
+  baseDependencies.forEach(dependency => addPackageJsonDependency(host, dependency));
   return host;
 }
 

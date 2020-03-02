@@ -1,41 +1,11 @@
 import { chain, Tree } from '@angular-devkit/schematics';
 import { workspaces } from '@angular-devkit/core';
-import {
-  addPackageJsonDependency,
-  NodeDependencyType,
-  removePackageJsonDependency
-} from '@schematics/angular/utility/dependencies';
+import { addPackageJsonDependency, removePackageJsonDependency } from '@schematics/angular/utility/dependencies';
 import { updateWorkspace } from '@schematics/angular/utility/workspace';
+import { jestDependencies } from './dependencies';
 
 export function addDependenciesToPackageJson(host: Tree) {
-  const deps = [
-    {
-      type: NodeDependencyType.Dev,
-      name: '@types/jest',
-      version: '^25.0.0'
-    },
-    {
-      type: NodeDependencyType.Dev,
-      name: '@angular-builders/jest',
-      version: '^9.0.0-beta.3'
-    },
-    {
-      type: NodeDependencyType.Dev,
-      name: 'jest',
-      version: '^25.0.0'
-    }
-  ];
-  deps.push({
-    type: NodeDependencyType.Dev,
-    name: 'ng-mocks',
-    version: '^8.0.0'
-  });
-  deps.push({
-    type: NodeDependencyType.Dev,
-    name: '@ngneat/spectator',
-    version: '^4.11.0'
-  });
-  deps.forEach(dependency => addPackageJsonDependency(host, dependency));
+  jestDependencies.forEach(dependency => addPackageJsonDependency(host, dependency));
   return host;
 }
 
