@@ -1,6 +1,6 @@
 {
   "name": "@wykks/schematics",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Opinionated angular schematics",
   "scripts": {
     "build": "tsc -p tsconfig.json"
