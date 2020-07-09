@@ -30,10 +30,20 @@ function removeProtractor(host: Tree) {
     host.delete(file);
   });
   removePackageJsonDependency(host, "protractor");
+  const tsConfigPath = "/tsconfig.json";
+  const tsConfigText = host.read(tsConfigPath)!.toString("utf-8");
+  const tsConfig = JSON.parse(stripJsonComments(tsConfigText));
+  const idx = tsConfig.references.findIndex((ref: { path: string }) =>
+    /e2e/.test(ref.path)
+  );
+  if (idx >= 0) {
+    tsConfig.references.splice(idx, 1);
+    host.overwrite(tsConfigPath, JSON.stringify(tsConfig, null, 2));
+  }
   return host;
 }
 
-function editTsConfig(host: Tree) {
+function editTsConfigBase(host: Tree) {
   const tsConfigPath = "/tsconfig.base.json";
 
   const tsConfigText = host.read(tsConfigPath)!.toString("utf-8");
@@ -151,7 +161,7 @@ export default function (options: any): Rule {
       removeProtractor,
       updateWorkspace(editAngularConfig),
       addDependenciesToPackageJson,
-      editTsConfig,
+      editTsConfigBase,
       addConfigToPackageJSON,
       editTsLint,
       addOnPushToComponent,
