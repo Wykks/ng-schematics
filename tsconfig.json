@@ -18,7 +18,8 @@
     "strictNullChecks": true,
     "target": "es6",
     "types": ["node"],
-    "strict": true
+    "strict": true,
+    "esModuleInterop": true
   },
   "include": ["src/**/*"],
   "exclude": ["src/*/files/**/*"]

@@ -1,4 +1,4 @@
-import { strings, workspaces, JsonArray } from "@angular-devkit/core";
+import { JsonArray, strings, workspaces } from "@angular-devkit/core";
 import {
   apply,
   applyToSubtree,
@@ -9,23 +9,24 @@ import {
   SchematicContext,
   template,
   Tree,
-  url
+  url,
 } from "@angular-devkit/schematics";
 import {
   NodePackageInstallTask,
-  RepositoryInitializerTask
+  RepositoryInitializerTask,
 } from "@angular-devkit/schematics/tasks";
 import {
   addPackageJsonDependency,
-  removePackageJsonDependency
+  removePackageJsonDependency,
 } from "@schematics/angular/utility/dependencies";
 import { updateWorkspace } from "@schematics/angular/utility/workspace";
+import stripJsonComments from "strip-json-comments";
 import { addOnPushToComponent } from "./addOnPush";
 import { baseDependencies } from "./dependencies";
 import { jestChain } from "./jest";
 
 function removeProtractor(host: Tree) {
-  host.getDir("e2e").visit(file => {
+  host.getDir("e2e").visit((file) => {
     host.delete(file);
   });
   removePackageJsonDependency(host, "protractor");
@@ -33,17 +34,15 @@ function removeProtractor(host: Tree) {
 }
 
 function editTsConfig(host: Tree) {
-  const tsConfigPath = "/tsconfig.json";
+  const tsConfigPath = "/tsconfig.base.json";
 
   const tsConfigText = host.read(tsConfigPath)!.toString("utf-8");
-  const tsConfig = JSON.parse(tsConfigText);
+  const tsConfig = JSON.parse(stripJsonComments(tsConfigText));
 
-  tsConfig.compilerOptions.strict = true;
   tsConfig.compilerOptions.strictPropertyInitialization = false;
   tsConfig.compilerOptions.noUnusedParameters = true;
   tsConfig.compilerOptions.noUnusedLocals = true;
   tsConfig.compilerOptions.plugins = [{ name: "typescript-tslint-plugin" }];
-  tsConfig.angularCompilerOptions.strictTemplates = true;
 
   host.overwrite(tsConfigPath, JSON.stringify(tsConfig, null, 2));
 }
@@ -56,17 +55,17 @@ function addConfigToPackageJSON(host: Tree) {
 
   packageJson.husky = {
     hooks: {
-      "pre-commit": "lint-staged"
-    }
+      "pre-commit": "lint-staged",
+    },
   };
 
   packageJson["lint-staged"] = {
     "*.{js,json,css,scss,md,ts,html}": "prettier --write",
-    "*.ts": "tslint -c tslint.json -p tsconfig.json --fix"
+    "*.ts": "tslint -c tslint.json -p tsconfig.json --fix",
   };
 
   packageJson.commitizen = {
-    path: "cz-conventional-changelog"
+    path: "cz-conventional-changelog",
   };
 
   const scripts = packageJson.scripts;
@@ -82,20 +81,20 @@ function addConfigToPackageJSON(host: Tree) {
 }
 
 function addDependenciesToPackageJson(host: Tree) {
-  baseDependencies.forEach(dependency =>
+  baseDependencies.forEach((dependency) =>
     addPackageJsonDependency(host, dependency)
   );
   return host;
 }
 
 function editAngularConfig(workspace: workspaces.WorkspaceDefinition) {
-  workspace.projects.forEach(project => {
+  workspace.projects.forEach((project) => {
     project.targets.delete("e2e");
     const lintTargetOptions = project.targets.get("lint")!.options!;
     lintTargetOptions.format = "stylish";
     const e2eConfigIdx = (<JsonArray>(
       lintTargetOptions.tsConfig
-    )).findIndex(config => /e2e/.test(<string>config));
+    )).findIndex((config) => /e2e/.test(<string>config));
     if (e2eConfigIdx > -1) {
       (<JsonArray>lintTargetOptions.tsConfig).splice(e2eConfigIdx, 1);
     }
@@ -122,7 +121,7 @@ function editTsLint(host: Tree) {
   host.overwrite(tsLintPath, JSON.stringify(tsLint, null, 2));
 }
 
-export default function(options: any): Rule {
+export default function (options: any): Rule {
   if (!options.directory) {
     options.directory = options.name;
   }
@@ -131,7 +130,7 @@ export default function(options: any): Rule {
     name: options.name,
     version: options.version,
     newProjectRoot: options.newProjectRoot,
-    strict: false,
+    strict: true,
     packageManager: options.packageManager,
     projectRoot: "",
     inlineStyle: options.inlineStyle,
@@ -142,7 +141,7 @@ export default function(options: any): Rule {
     style: "scss",
     skipInstall: true,
     skipGit: true,
-    skipTests: true
+    skipTests: true,
   };
 
   return chain([
@@ -156,7 +155,7 @@ export default function(options: any): Rule {
       addConfigToPackageJSON,
       editTsLint,
       addOnPushToComponent,
-      mergeWith(apply(url("./files"), [template({ utils: strings })]))
+      mergeWith(apply(url("./files"), [template({ utils: strings })])),
     ]),
     (_host: Tree, context: SchematicContext) => {
       let packageTask;
@@ -164,7 +163,7 @@ export default function(options: any): Rule {
         packageTask = context.addTask(
           new NodePackageInstallTask({
             workingDirectory: options.directory,
-            packageManager: options.packageManager
+            packageManager: options.packageManager,
           })
         );
       }
@@ -181,6 +180,6 @@ export default function(options: any): Rule {
           packageTask ? [packageTask] : []
         );
       }
-    }
+    },
   ]);
 }
