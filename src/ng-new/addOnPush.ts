@@ -16,15 +16,19 @@ export function addOnPushToComponent(host: Tree) {
   const program = ts.createProgram([appComponentFilePath], {}, tsHost);
   const appComponentSourceFile = program.getSourceFiles()[0];
   const update = host.beginUpdate(appComponentFilePath);
-  appComponentSourceFile.forEachChild(node => {
+  appComponentSourceFile.forEachChild((node) => {
     if (ts.isClassDeclaration(node)) {
       addOnPushToComponentDecorator(node, update);
     }
     if (ts.isImportDeclaration(node)) {
       if ((<any>node.moduleSpecifier).text === '@angular/core') {
-        const importTokens = (<ts.NamedImports>node.importClause!.namedBindings).elements;
+        const importTokens = (<ts.NamedImports>node.importClause!.namedBindings)
+          .elements;
         const lastImportToken = importTokens[importTokens.length - 1];
-        update.insertRight(lastImportToken.getEnd(), ', ChangeDetectionStrategy');
+        update.insertRight(
+          lastImportToken.getEnd(),
+          ', ChangeDetectionStrategy'
+        );
       }
     }
   });
@@ -32,18 +36,29 @@ export function addOnPushToComponent(host: Tree) {
   return host;
 }
 
-function addOnPushToComponentDecorator(node: ts.ClassDeclaration, update: UpdateRecorder) {
+function addOnPushToComponentDecorator(
+  node: ts.ClassDeclaration,
+  update: UpdateRecorder
+) {
   const componentDecorator: ts.Decorator = node.decorators!.find(
-    node => (<any>node.expression).expression.escapedText === 'Component'
+    (node) => (<any>node.expression).expression.escapedText === 'Component'
   )!;
   if (!ts.isCallExpression(componentDecorator.expression)) {
-    console.warn('AppComponent OnPush addition: component decorator not recognised, skipping...');
+    console.warn(
+      'AppComponent OnPush addition: component decorator not recognised, skipping...'
+    );
     return;
   }
-  const componentDecoratorArg = <ts.ObjectLiteralExpressionBase<ts.ObjectLiteralElement>>(
-    componentDecorator.expression.arguments[0]
-  );
-  const lastComponentOption = componentDecoratorArg.properties[componentDecoratorArg.properties.length - 1];
+  const componentDecoratorArg = <
+    ts.ObjectLiteralExpressionBase<ts.ObjectLiteralElement>
+  >componentDecorator.expression.arguments[0];
+  const lastComponentOption =
+    componentDecoratorArg.properties[
+      componentDecoratorArg.properties.length - 1
+    ];
 
-  update.insertRight(lastComponentOption.getEnd(), ',\n  changeDetection: ChangeDetectionStrategy.OnPush');
+  update.insertRight(
+    lastComponentOption.getEnd(),
+    ',\n  changeDetection: ChangeDetectionStrategy.OnPush'
+  );
 }
